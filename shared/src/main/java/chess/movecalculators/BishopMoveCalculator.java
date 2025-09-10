@@ -6,6 +6,7 @@ import chess.ChessPosition;
 
 import java.util.List;
 import java.util.Collection;
+import java.util.ArrayList;
 
 public class BishopMoveCalculator {
 
@@ -17,7 +18,7 @@ public class BishopMoveCalculator {
     public Collection<ChessMove> calculateMoves(ChessBoard board, ChessPosition position) {
         int startRow = position.getRow();
         int startCol = position.getColumn();
-        List<ChessMove> moves = new java.util.ArrayList<>();
+        List<ChessMove> moves = new ArrayList<>();
         for (int[] direction : BISHOP_DIRECTIONS) {
             int dRow = direction[0];
             int dCol = direction[1];
