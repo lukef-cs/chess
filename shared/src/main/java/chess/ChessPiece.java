@@ -47,22 +47,6 @@ public class ChessPiece {
         return type;
     }
 
-    private final int[][] KNIGHT_OFFSETS = {
-            {-2,1},{-2,-1},{-1,-2},{-1,2},{1,-2},{1,2},{2,-1},{2,1}
-    };
-    private final int[][] KING_OFFSETS = {
-            {1,1},{-1,1},{1,-1},{1,0},{-1,0},{0,1},{0,-1}
-    };
-    private final int[][] ROOK_DIRECTIONS = {
-            {-1,0},{1,0},{0,1},{0,-1}
-    };
-    private final int[][] BISHOP_DIRECTIONS = {
-            {1,1},{-1,1},{-1,-1},{1,-1}
-    };
-    private final int[][] QUEEN_DIRECTIONS = { // Bishop + Rook
-            {-1,0},{1,0},{0,-1},{0,1},{-1,-1},{-1,1},{1,-1},{1,1}
-    };
-
     /**
      * Calculates all the positions a chess piece can move to
      * Does not take into account moves that are illegal due to leaving the king in
