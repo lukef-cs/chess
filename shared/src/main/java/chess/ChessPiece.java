@@ -11,7 +11,12 @@ import java.util.List;
  */
 public class ChessPiece {
 
+    private final ChessGame.TeamColor pieceColor;
+    private final PieceType type;
+
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
+        this.pieceColor = pieceColor;
+        this.type = type;
     }
 
     /**
@@ -30,15 +35,31 @@ public class ChessPiece {
      * @return Which team this chess piece belongs to
      */
     public ChessGame.TeamColor getTeamColor() {
-        throw new RuntimeException("Not implemented");
+        return pieceColor;
     }
 
     /**
      * @return which type of chess piece this piece is
      */
     public PieceType getPieceType() {
-        throw new RuntimeException("Not implemented");
+        return type;
     }
+
+    private final int[][] KNIGHT_OFFSETS = {
+            {-2,1},{-2,-1},{-1,-2},{-1,2},{1,-2},{1,2},{2,-1},{2,1}
+    };
+    private final int[][] KING_OFFSETS = {
+            {1,1},{-1,1},{1,-1},{1,0},{-1,0},{0,1},{0,-1}
+    };
+    private final int[][] ROOK_DIRECTIONS = {
+            {-1,0},{1,0},{0,1},{0,-1}
+    };
+    private final int[][] BISHOP_DIRECTIONS = {
+            {1,1},{-1,1},{-1,-1},{1,-1}
+    };
+    private final int[][] QUEEN_DIRECTIONS = { // Bishop + Rook
+            {-1,0},{1,0},{0,-1},{0,1},{-1,-1},{-1,1},{1,-1},{1,1}
+    };
 
     /**
      * Calculates all the positions a chess piece can move to
@@ -48,6 +69,10 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
+        ChessPiece piece = board.getPiece(myPosition);
+        if(piece.getPieceType() == PieceType.BISHOP) {
+
+        }
         return List.of();
     }
 }
