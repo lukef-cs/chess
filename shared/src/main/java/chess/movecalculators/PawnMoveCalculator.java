@@ -10,7 +10,7 @@ import java.util.List;
 public class PawnMoveCalculator {
 
     public Collection<ChessMove> calculateMoves(ChessBoard board, ChessPosition position) {
-        // Placeholder for King move calculation logic
+
         return List.of();
     }
 }

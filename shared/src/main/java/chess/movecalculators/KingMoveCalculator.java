@@ -9,6 +9,10 @@ import java.util.List;
 
 public class KingMoveCalculator {
 
+    private final int[][] KING_OFFSETS = {
+            {1,1},{-1,1},{1,-1},{1,0},{-1,0},{0,1},{0,-1}
+    };
+
     public Collection<ChessMove> calculateMoves(ChessBoard board, ChessPosition position) {
         // Placeholder for King move calculation logic
         return List.of();

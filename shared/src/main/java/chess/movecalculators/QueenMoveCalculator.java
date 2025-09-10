@@ -9,6 +9,11 @@ import java.util.List;
 
 public class QueenMoveCalculator {
 
+    private final int[][] QUEEN_DIRECTIONS = { // Bishop + Rook
+        {-1,0},{1,0},{0,-1},{0,1},{-1,-1},{-1,1},{1,-1},{1,1}
+    };
+
+
     public Collection<ChessMove> calculateMoves(ChessBoard board, ChessPosition position) {
         // Placeholder for King move calculation logic
         return List.of();

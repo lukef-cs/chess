@@ -3,6 +3,8 @@ package chess;
 import java.util.Collection;
 import java.util.List;
 
+import chess.movecalculators.MoveCalculator;
+
 /**
  * Represents a single chess piece
  * <p>
