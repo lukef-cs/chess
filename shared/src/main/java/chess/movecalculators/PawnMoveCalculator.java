@@ -54,14 +54,14 @@ public class PawnMoveCalculator {
                     if (ourColor != pieceColor){
                         // we can take it
                         if (shouldPromote) {
-                            moves.add(new ChessMove(position, newPosition, board.getPiece(position).getPieceType()));
+                            moves.add(new ChessMove(position, newPosition, ChessPiece.PieceType.QUEEN));
                         } else {
                             moves.add(new ChessMove(position, newPosition, null));
                         }
                     }
                 } else if (startCol == newCol) {
                     if (shouldPromote) {
-                        moves.add(new ChessMove(position, newPosition, board.getPiece(position).getPieceType()));
+                        moves.add(new ChessMove(position, newPosition, ChessPiece.PieceType.QUEEN));
                     } else {
                         moves.add(new ChessMove(position, newPosition, null));
                     }
