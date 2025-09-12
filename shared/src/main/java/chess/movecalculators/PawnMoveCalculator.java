@@ -11,6 +11,14 @@ import java.util.List;
 
 
 public class PawnMoveCalculator {
+    
+    private void addPromotionMoves(List<ChessMove> moves, ChessPosition startPosition, ChessPosition endPosition) {
+        // Add all 4 possible promotion moves
+        moves.add(new ChessMove(startPosition, endPosition, ChessPiece.PieceType.QUEEN));
+        moves.add(new ChessMove(startPosition, endPosition, ChessPiece.PieceType.BISHOP));
+        moves.add(new ChessMove(startPosition, endPosition, ChessPiece.PieceType.ROOK));
+        moves.add(new ChessMove(startPosition, endPosition, ChessPiece.PieceType.KNIGHT));
+    }
 
     private int [][] getPawnOffsets(TeamColor color, ChessPosition position) {
         if(color == TeamColor.BLACK){
@@ -46,7 +54,6 @@ public class PawnMoveCalculator {
                 ChessPiece theirPiece = board.getPiece(newPosition);
                 if(board.getPiece(newPosition) != null && newCol == startCol){
                     // Cant go forwards into someone
-                    System.out.println("bruh");
                     continue;
                 }
                 if(board.getPiece(newPosition) != null){
@@ -54,14 +61,14 @@ public class PawnMoveCalculator {
                     if (ourColor != pieceColor){
                         // we can take it
                         if (shouldPromote) {
-                            moves.add(new ChessMove(position, newPosition, ChessPiece.PieceType.QUEEN));
+                            addPromotionMoves(moves, position, newPosition);
                         } else {
                             moves.add(new ChessMove(position, newPosition, null));
                         }
                     }
                 } else if (startCol == newCol) {
                     if (shouldPromote) {
-                        moves.add(new ChessMove(position, newPosition, ChessPiece.PieceType.QUEEN));
+                        addPromotionMoves(moves, position, newPosition);
                     } else {
                         moves.add(new ChessMove(position, newPosition, null));
                     }
