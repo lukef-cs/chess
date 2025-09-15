@@ -83,11 +83,9 @@ public class ChessBoard {
     public void resetBoard() {
         squares = new ChessPiece[8][8];
 
-        // --- White at bottom (rows 6–7) ---
         placeBackRank(0, ChessGame.TeamColor.WHITE);
         placePawns(1, ChessGame.TeamColor.WHITE);
 
-        // --- Black at top (rows 0–1) ---
         placeBackRank(7, ChessGame.TeamColor.BLACK);
         placePawns(6, ChessGame.TeamColor.BLACK);
     }
