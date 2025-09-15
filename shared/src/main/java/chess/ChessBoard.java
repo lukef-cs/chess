@@ -1,5 +1,8 @@
 package chess;
 
+import java.util.Arrays;
+import java.util.Objects;
+
 /**
  * A chessboard that can hold and rearrange chess pieces.
  * <p>
@@ -12,6 +15,20 @@ public class ChessBoard {
 
     public ChessBoard() {
 
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChessBoard that = (ChessBoard) o;
+        return Objects.deepEquals(squares, that.squares);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.deepHashCode(squares);
     }
 
     /**
@@ -36,11 +53,42 @@ public class ChessBoard {
         return squares[position.getRow()-1][position.getColumn()-1];
     }
 
+    private static final ChessPiece.PieceType[] BACK_RANK = {
+            ChessPiece.PieceType.ROOK,
+            ChessPiece.PieceType.KNIGHT,
+            ChessPiece.PieceType.BISHOP,
+            ChessPiece.PieceType.QUEEN,
+            ChessPiece.PieceType.KING,
+            ChessPiece.PieceType.BISHOP,
+            ChessPiece.PieceType.KNIGHT,
+            ChessPiece.PieceType.ROOK
+    };
+
+    private void placeBackRank(int row, ChessGame.TeamColor color) {
+        for (int col = 0; col < 8; col++) {
+            squares[row][col] = new ChessPiece(color, BACK_RANK[col]);
+        }
+    }
+
+    private void placePawns(int row, ChessGame.TeamColor color) {
+            for (int col = 0; col < 8; col++) {
+                squares[row][col] = new ChessPiece(color, ChessPiece.PieceType.PAWN);
+            }
+        }
+
     /**
      * Sets the board to the default starting board
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
-        throw new RuntimeException("Not implemented");
+        squares = new ChessPiece[8][8];
+
+        // --- White at bottom (rows 6–7) ---
+        placeBackRank(0, ChessGame.TeamColor.WHITE);
+        placePawns(1, ChessGame.TeamColor.WHITE);
+
+        // --- Black at top (rows 0–1) ---
+        placeBackRank(7, ChessGame.TeamColor.BLACK);
+        placePawns(6, ChessGame.TeamColor.BLACK);
     }
 }
