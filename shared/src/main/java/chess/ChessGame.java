@@ -14,8 +14,43 @@ public class ChessGame {
     private TeamColor teamTurn;
 
     public ChessGame() {
-        board = new ChessBoard();
-        teamTurn = TeamColor.WHITE;
+        this.board = new ChessBoard();
+        this.board.resetBoard();
+        this.teamTurn = TeamColor.WHITE;
+    }
+
+    private boolean isInCheck(ChessBoard board, TeamColor team){
+        ChessPosition kingPosition = null;
+        // find the king
+        for (int row = 1; row <= 8; row++){
+            for (int col = 1; col <= 8; col++) {
+                ChessPosition position = new ChessPosition(row, col);
+                ChessPiece piece = board.getPiece(position);
+                if (piece != null && piece.getTeamColor() == team && piece.getPieceType() == ChessPiece.PieceType.KING) {
+                    kingPosition = position;
+                    break;
+                }
+            }
+            if (kingPosition != null) break;
+        }
+        if (kingPosition == null) return false;
+        TeamColor opponentColor = team == TeamColor.WHITE ? TeamColor.BLACK : TeamColor.WHITE;
+
+        for (int row = 1; row <= 8; row++){
+            for (int col = 1; col <= 8; col++) {
+                ChessPosition position = new ChessPosition(row, col);
+                ChessPiece piece = board.getPiece(position);
+                if(piece != null && piece.getTeamColor() == opponentColor){
+                    Collection<ChessMove> moves = piece.pieceMoves(board, position);
+                    for (ChessMove move : moves){
+                        if(move.getEndPosition() == kingPosition){
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     /**
