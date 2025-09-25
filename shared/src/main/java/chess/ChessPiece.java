@@ -1,10 +1,9 @@
 package chess;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Objects;
 
-import chess.movecalculators.MoveCalculator;
+import chess.movecalculators.MoveCalculatorHandler;
 
 /**
  * Represents a single chess piece
@@ -69,7 +68,7 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        MoveCalculator calculator = new MoveCalculator();
+        MoveCalculatorHandler calculator = new MoveCalculatorHandler();
         return calculator.calculateMoves(board, myPosition);
     }
 }

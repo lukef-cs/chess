@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class QueenMoveCalculator {
+public class QueenMoveCalculator extends MoveCalculator{
 
     private final int[][] QUEEN_DIRECTIONS = { // Bishop + Rook
         {-1,0},{1,0},{0,-1},{0,1},{-1,-1},{-1,1},{1,-1},{1,1}
@@ -16,31 +16,6 @@ public class QueenMoveCalculator {
 
 
     public Collection<ChessMove> calculateMoves(ChessBoard board, ChessPosition position) {
-        int startRow = position.getRow();
-        int startCol = position.getColumn();
-        List<ChessMove> moves = new ArrayList<>();
-        for (int[] direction : QUEEN_DIRECTIONS) {
-            int dRow = direction[0];
-            int dCol = direction[1];
-            int currentRow = startRow + dRow;
-            int currentCol = startCol + dCol;
-
-            while (currentRow > 0 && currentRow <= 8 && currentCol > 0 && currentCol <= 8) {
-                ChessPosition newPosition = new ChessPosition(currentRow, currentCol);
-                // detect if we've hit a piece
-                if (board.getPiece(newPosition) != null) {
-                    // If it's an opponent's piece, we can capture it
-                    if (board.getPiece(newPosition).getTeamColor() != board.getPiece(position).getTeamColor()) {
-                        moves.add(new ChessMove(position, newPosition, null));
-                    }
-                    break; // Stop moving in this direction
-                }
-
-                moves.add(new ChessMove(position, newPosition, null));
-                currentRow += dRow;
-                currentCol += dCol;
-            }
-        }
-        return moves;
+        return calculateMovesFromDirections(board, position, QUEEN_DIRECTIONS);
     }
 }
