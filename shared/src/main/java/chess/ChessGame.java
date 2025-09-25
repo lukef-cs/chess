@@ -68,7 +68,7 @@ public class ChessGame {
                 if(piece != null && piece.getTeamColor() == opponentColor){
                     Collection<ChessMove> moves = piece.pieceMoves(board, position);
                     for (ChessMove move : moves){
-                        if(move.getEndPosition() == kingPosition){
+                        if(move.getEndPosition().equals(kingPosition)){
                             return true;
                         }
                     }
