@@ -24,7 +24,6 @@ public class ChessPosition {
      */
     public int getRow() {
         return row;
-
     }
 
     /**
@@ -33,7 +32,6 @@ public class ChessPosition {
      */
     public int getColumn() {
         return col;
-
     }
 
     @Override
