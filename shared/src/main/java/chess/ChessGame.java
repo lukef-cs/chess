@@ -73,18 +73,20 @@ public class ChessGame {
             for (int col = 1; col <= 8; col++) {
                 ChessPosition position = new ChessPosition(row, col);
                 ChessPiece piece = board.getPiece(position);
-                if (piece != null && piece.getTeamColor() == opponentColor) {
-                    Collection<ChessMove> moves = piece.pieceMoves(board, position);
-                    for (ChessMove move : moves) {
-                        if (move.getEndPosition().equals(targetPosition)) {
-                            return true;
-                        }
+                if (piece == null || piece.getTeamColor() != opponentColor) {
+                    continue;
+                }
+                Collection<ChessMove> moves = piece.pieceMoves(board, position);
+                for (ChessMove move : moves) {
+                    if (move.getEndPosition().equals(targetPosition)) {
+                        return true;
                     }
                 }
             }
         }
         return false;
     }
+
 
     /**
      * @return Which team's turn it is

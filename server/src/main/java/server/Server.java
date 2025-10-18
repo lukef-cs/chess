@@ -69,6 +69,17 @@ public class Server {
         javalin.delete("/db", ctx -> handleClear(ctx));
     }
 
+    private void returnStatus(ServiceException e, Context ctx) {
+        String message = e.getMessage();
+        if (message.contains("unauthorized")) {
+            ctx.status(401).result(gson.toJson(Map.of("message", "Error: unauthorized"))).contentType("application/json");
+        } else if (message.contains("bad request")) {
+            ctx.status(400).result(gson.toJson(Map.of("message", "Error: bad request"))).contentType("application/json");
+        } else {
+            ctx.status(500).result(gson.toJson(Map.of("message", message))).contentType("application/json");
+        }
+    }
+
     private void handleRegister(Context ctx) {
         try {
             RegisterRequest request = gson.fromJson(ctx.body(), RegisterRequest.class);
@@ -92,14 +103,7 @@ public class Server {
             LoginResult result = userService.login(request);
             ctx.status(200).result(gson.toJson(result)).contentType("application/json");
         } catch (ServiceException e) {
-            String message = e.getMessage();
-            if (message.contains("unauthorized")) {
-                ctx.status(401).result(gson.toJson(Map.of("message", "Error: unauthorized"))).contentType("application/json");
-            } else if (message.contains("bad request")) {
-                ctx.status(400).result(gson.toJson(Map.of("message", "Error: bad request"))).contentType("application/json");
-            } else {
-                ctx.status(500).result(gson.toJson(Map.of("message", message))).contentType("application/json");
-            }
+            returnStatus(e, ctx);
         }
     }
 
@@ -125,14 +129,7 @@ public class Server {
             CreateGameResult result = gameService.createGame(request, authToken);
             ctx.status(200).result(gson.toJson(result)).contentType("application/json");
         } catch (ServiceException e) {
-            String message = e.getMessage();
-            if (message.contains("unauthorized")) {
-                ctx.status(401).result(gson.toJson(Map.of("message", "Error: unauthorized"))).contentType("application/json");
-            } else if (message.contains("bad request")) {
-                ctx.status(400).result(gson.toJson(Map.of("message", "Error: bad request"))).contentType("application/json");
-            } else {
-                ctx.status(500).result(gson.toJson(Map.of("message", message))).contentType("application/json");
-            }
+            returnStatus(e, ctx);
         }
     }
 
