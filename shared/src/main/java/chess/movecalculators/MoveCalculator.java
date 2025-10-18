@@ -9,12 +9,12 @@ import java.util.Collection;
 import java.util.List;
 
 public class MoveCalculator {
-    public static Collection<ChessMove> calculateMovesFromOffset(ChessBoard board, ChessPosition position, int[][] PIECE_OFFSETS) {
+    public static Collection<ChessMove> calculateMovesFromOffset(ChessBoard board, ChessPosition position, int[][] pieceOffsets) {
         int startRow = position.getRow();
         int startCol = position.getColumn();
         List<ChessMove> moves = new ArrayList<>();
 
-        for (int[] offset : PIECE_OFFSETS) {
+        for (int[] offset : pieceOffsets) {
             int newRow = startRow + offset[0];
             int newCol = startCol + offset[1];
 
@@ -36,11 +36,11 @@ public class MoveCalculator {
         return moves;
     }
 
-    public static Collection<ChessMove> calculateMovesFromDirections(ChessBoard board, ChessPosition position, int[][] PIECE_DIRECTIONS) {
+    public static Collection<ChessMove> calculateMovesFromDirections(ChessBoard board, ChessPosition position, int[][] pieceDirections) {
         int startRow = position.getRow();
         int startCol = position.getColumn();
         List<ChessMove> moves = new ArrayList<>();
-        for (int[] direction : PIECE_DIRECTIONS) {
+        for (int[] direction : pieceDirections) {
             int dRow = direction[0];
             int dCol = direction[1];
             int currentRow = startRow + dRow;

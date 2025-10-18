@@ -44,31 +44,39 @@ public class ChessGame {
         return Objects.hash(board, teamTurn);
     }
 
-    private boolean isInCheck(ChessBoard board, TeamColor team){
-        ChessPosition kingPosition = null;
-        // find the king
-        for (int row = 1; row <= 8; row++){
+    private boolean isInCheck(ChessBoard board, TeamColor team) {
+        ChessPosition kingPosition = findKing(board, team);
+        if (kingPosition == null) {
+            return false;
+        }
+
+        TeamColor opponentColor = team == TeamColor.BLACK ? TeamColor.WHITE : TeamColor.BLACK;
+        return canOpponentAttackPosition(board, opponentColor, kingPosition);
+    }
+
+    private ChessPosition findKing(ChessBoard board, TeamColor team) {
+        for (int row = 1; row <= 8; row++) {
             for (int col = 1; col <= 8; col++) {
                 ChessPosition position = new ChessPosition(row, col);
                 ChessPiece piece = board.getPiece(position);
-                if (piece != null && piece.getTeamColor() == team && piece.getPieceType() == ChessPiece.PieceType.KING) {
-                    kingPosition = position;
-                    break;
+                if (piece != null && piece.getTeamColor() == team &&
+                    piece.getPieceType() == ChessPiece.PieceType.KING) {
+                    return position;
                 }
             }
-            if (kingPosition != null) break;
         }
-        if (kingPosition == null) return false;
-        TeamColor opponentColor = team == TeamColor.WHITE ? TeamColor.BLACK : TeamColor.WHITE;
+        return null;
+    }
 
-        for (int row = 1; row <= 8; row++){
+    private boolean canOpponentAttackPosition(ChessBoard board, TeamColor opponentColor, ChessPosition targetPosition) {
+        for (int row = 1; row <= 8; row++) {
             for (int col = 1; col <= 8; col++) {
                 ChessPosition position = new ChessPosition(row, col);
                 ChessPiece piece = board.getPiece(position);
-                if(piece != null && piece.getTeamColor() == opponentColor){
+                if (piece != null && piece.getTeamColor() == opponentColor) {
                     Collection<ChessMove> moves = piece.pieceMoves(board, position);
-                    for (ChessMove move : moves){
-                        if(move.getEndPosition().equals(kingPosition)){
+                    for (ChessMove move : moves) {
+                        if (move.getEndPosition().equals(targetPosition)) {
                             return true;
                         }
                     }
