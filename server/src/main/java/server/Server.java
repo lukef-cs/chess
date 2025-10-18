@@ -1,6 +1,9 @@
 package server;
 
 import io.javalin.*;
+
+import java.util.Map;
+
 import com.google.gson.Gson;
 
 import dataaccess.auth.AuthDAO;
@@ -21,6 +24,7 @@ public class Server {
     private final Gson gson = new Gson();
     private final UserService userService;
     private final ClearService clearService;
+    private final GameService gameService;
 
     public Server() {
 
@@ -30,6 +34,7 @@ public class Server {
 
         this.userService = new UserService(userDAO, authDAO);
         this.clearService = new ClearService(userDAO, gameDAO, authDAO);
+        this.gameService = new GameService(gameDAO, authDAO);
 
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
 
@@ -49,6 +54,42 @@ public class Server {
             }
         });
         // Register your endpoints and exception handlers here.
+
+        javalin.post("/session", ctx -> {  // Use /session as per rubric
+            try {
+                LoginRequest request = gson.fromJson(ctx.body(), LoginRequest.class);
+                LoginResult result = userService.login(request);
+                ctx.status(200).result(gson.toJson(result)).contentType("application/json");
+            } catch (ServiceException e) {
+                System.out.println(e.getMessage());
+                if(e.getMessage().contains("bad request")){
+
+                    // WE'RE USING MAP.OF, idk if we should be using that
+
+
+                    ctx.status(400).result(gson.toJson(Map.of("message", "Error: bad request"))).contentType("application/json");
+                } else {
+                    ctx.status(401).result(gson.toJson(Map.of("message", "Error: unauthorized"))).contentType("application/json");
+                }
+            }
+        });
+
+        javalin.delete("/session", ctx -> {
+            try {
+                String authToken = ctx.header("Authorization");
+                if (authToken == null) {
+                    ctx.status(401).result(gson.toJson(Map.of("message", "Error: unauthorized"))).contentType("application/json");
+                    return;
+                }
+                LogoutRequest request = new LogoutRequest(authToken);  // Assuming LogoutRequest(String authToken)
+                userService.logout(request);
+                ctx.status(200);
+            } catch (ServiceException e) {
+                ctx.status(401).result(gson.toJson(Map.of("message", "Error: " + e.getMessage()))).contentType("application/json");
+            }
+        });
+
+
 
     }
 
