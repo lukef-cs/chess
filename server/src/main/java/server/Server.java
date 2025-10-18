@@ -125,6 +125,20 @@ public class Server {
             }
         });
 
+        javalin.get("/game", ctx -> {
+            try {
+                String authToken = ctx.header("Authorization");
+                ListGamesResult result = gameService.listGames(authToken);
+                ctx.status(200).result(gson.toJson(result)).contentType("application/json");
+            } catch (ServiceException e) {
+                if (e.getMessage().contains("unauthorized")) {
+                    ctx.status(401).result(gson.toJson(Map.of("message", "Error: unauthorized"))).contentType("application/json");
+                } else {
+                    ctx.status(500).result(gson.toJson(Map.of("message", "Error: " + e.getMessage()))).contentType("application/json");
+                }
+            }
+        });
+
     }
 
     public int run(int desiredPort) {
