@@ -10,7 +10,7 @@ import java.util.List;
 
 public class QueenMoveCalculator extends MoveCalculator{
 
-    private final int[][] QUEEN_DIRECTIONS = { // Bishop + Rook
+    private static final int[][] QUEEN_DIRECTIONS = { // Bishop + Rook
         {-1,0},{1,0},{0,-1},{0,1},{-1,-1},{-1,1},{1,-1},{1,1}
     };
 

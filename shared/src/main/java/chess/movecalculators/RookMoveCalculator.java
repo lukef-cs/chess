@@ -11,7 +11,7 @@ import java.util.List;
 public class RookMoveCalculator extends MoveCalculator {
 
 
-    private final int[][] ROOK_DIRECTIONS = {
+    private static final int[][] ROOK_DIRECTIONS = {
             {-1,0},{1,0},{0,1},{0,-1}
     };
 

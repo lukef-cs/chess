@@ -10,7 +10,7 @@ import java.util.List;
 
 public class KingMoveCalculator extends MoveCalculator{
 
-    private final int[][] KING_OFFSETS = {
+    private static final int[][] KING_OFFSETS = {
             {1,1},{-1,1},{1,-1},{-1,-1},{1,0},{-1,0},{0,1},{0,-1}
     };
 

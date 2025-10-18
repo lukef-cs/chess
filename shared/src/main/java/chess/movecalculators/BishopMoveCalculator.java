@@ -10,7 +10,7 @@ import java.util.ArrayList;
 
 public class BishopMoveCalculator extends MoveCalculator {
 
-    private final int[][] BISHOP_DIRECTIONS = {
+    private static final int[][] BISHOP_DIRECTIONS = {
         {1,1},{-1,1},{-1,-1},{1,-1}
     };
 
