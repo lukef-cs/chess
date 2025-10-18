@@ -18,108 +18,78 @@ import java.util.UUID;
  * Handles authentication and user management business logic.
  */
 public class UserService {
-    private final UserDAO userDAO;
-    private final AuthDAO authDAO;
+    private UserDAO userDAO;
+    private AuthDAO authDAO;
 
     public UserService(UserDAO userDAO, AuthDAO authDAO) {
         this.userDAO = userDAO;
         this.authDAO = authDAO;
     }
 
-    /**
-     * Register a new user.
-     *
-     * @param request contains username, password, and email
-     * @return RegisterResult with username and generated authToken
-     * @throws ServiceException if user already exists or validation fails
-     */
     public RegisterResult register(RegisterRequest request) throws ServiceException {
         try {
-            validateRegisterRequest(request);
+            // Validate input
+            if (request.username() == null || request.password() == null || request.email() == null) {
+                throw new ServiceException("Error: bad request");
+            }
 
-            if (userExists(request.username())) {
+            // Check if user already exists
+            UserData existingUser = userDAO.getUser(request.username());
+            if (existingUser != null) {
                 throw new ServiceException("Error: already taken");
             }
 
-            createUser(request);
-            String authToken = createAuthToken(request.username());
+            // Create new user
+            UserData newUser = new UserData(request.username(), request.password(), request.email());
+            userDAO.createUser(newUser);
+
+            // Create auth token
+            String authToken = UUID.randomUUID().toString();
+            AuthData authData = new AuthData(authToken, request.username());
+            authDAO.createAuth(authData);
 
             return new RegisterResult(request.username(), authToken);
-        } catch (DataAccessException exception) {
-            throw new ServiceException("Error: " + exception.getMessage());
+        } catch (DataAccessException e) {
+            throw new ServiceException("Error: " + e.getMessage());
         }
     }
 
-    /**
-     * Login an existing user.
-     *
-     * @param request contains username and password
-     * @return LoginResult with username and generated authToken
-     * @throws ServiceException if credentials are invalid
-     */
     public LoginResult login(LoginRequest request) throws ServiceException {
         try {
-            validateLoginRequest(request);
+            // Validate input
+            if (request.username() == null || request.password() == null) {
+                throw new ServiceException("Error: bad request");
+            }
 
+            // Check credentials
             UserData user = userDAO.getUser(request.username());
-            if (user == null || !isPasswordValid(user, request.password())) {
+            if (user == null || !user.password().equals(request.password())) {
                 throw new ServiceException("Error: unauthorized");
             }
 
-            String authToken = createAuthToken(request.username());
+            // Create auth token
+            String authToken = UUID.randomUUID().toString();
+            AuthData authData = new AuthData(authToken, request.username());
+            authDAO.createAuth(authData);
+
             return new LoginResult(request.username(), authToken);
-        } catch (DataAccessException exception) {
-            throw new ServiceException("Error: " + exception.getMessage());
+        } catch (DataAccessException e) {
+            throw new ServiceException("Error: " + e.getMessage());
         }
     }
 
-    /**
-     * Logout a user by invalidating their auth token.
-     *
-     * @param request contains authToken to invalidate
-     * @throws ServiceException if authToken is invalid
-     */
     public void logout(LogoutRequest request) throws ServiceException {
         try {
-            if (authDAO.getAuth(request.authToken()) == null) {
+            // Check if auth token exists
+            AuthData authData = authDAO.getAuth(request.authToken());
+            if (authData == null) {
                 throw new ServiceException("Error: unauthorized");
             }
 
+            // Delete auth token
             authDAO.deleteAuth(request.authToken());
-        } catch (DataAccessException exception) {
-            throw new ServiceException("Error: " + exception.getMessage());
+        } catch (DataAccessException e) {
+            throw new ServiceException("Error: " + e.getMessage());
         }
-    }
-
-    private void validateRegisterRequest(RegisterRequest request) throws ServiceException {
-        if (request.username() == null || request.password() == null || request.email() == null) {
-            throw new ServiceException("Error: bad request");
-        }
-    }
-
-    private void validateLoginRequest(LoginRequest request) throws ServiceException {
-        if (request.username() == null || request.password() == null) {
-            throw new ServiceException("Error: bad request");
-        }
-    }
-
-    private boolean userExists(String username) throws DataAccessException {
-        return userDAO.getUser(username) != null;
-    }
-
-    private void createUser(RegisterRequest request) throws DataAccessException {
-        UserData newUser = new UserData(request.username(), request.password(), request.email());
-        userDAO.createUser(newUser);
-    }
-
-    private String createAuthToken(String username) throws DataAccessException {
-        String authToken = UUID.randomUUID().toString();
-        AuthData authData = new AuthData(authToken, username);
-        authDAO.createAuth(authData);
-        return authToken;
-    }
-
-    private boolean isPasswordValid(UserData user, String providedPassword) {
-        return user.password().equals(providedPassword);
     }
 }
