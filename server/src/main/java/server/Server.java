@@ -139,6 +139,16 @@ public class Server {
             }
         });
 
+        javalin.delete("/db", ctx -> {
+            try {
+                clearService.clear();
+                ctx.status(200);
+
+            } catch (ServiceException e) {
+                ctx.status(500).result(gson.toJson(Map.of("message", "Error: " + e.getMessage()))).contentType("application/json");
+            }
+        });
+
     }
 
     public int run(int desiredPort) {
