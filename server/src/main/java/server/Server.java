@@ -45,11 +45,11 @@ public class Server {
                 ctx.status(200).result(gson.toJson(result)).contentType("application/json");
             } catch (ServiceException e) {
                 if (e.getMessage().contains("bad request")) {
-                    ctx.status(400).json(new ServiceException("Error: bad request"));
+                    ctx.status(400).result(gson.toJson(Map.of("message", "Error: bad request"))).contentType("application/json");
                 } else if (e.getMessage().contains("already taken")) {
-                    ctx.status(403).json(new ServiceException("Error: already taken"));
+                    ctx.status(403).result(gson.toJson(Map.of("message", "Error: already taken"))).contentType("application/json");
                 } else {
-                    ctx.status(500).json(new ServiceException("Error: " + e.getMessage()));
+                    ctx.status(500).result(gson.toJson(Map.of("message", "Error: " + e.getMessage()))).contentType("application/json");
                 }
             }
         });
@@ -89,7 +89,41 @@ public class Server {
             }
         });
 
+        javalin.post("/game", ctx -> {
+            try {
+                CreateGameRequest request = gson.fromJson(ctx.body(), CreateGameRequest.class);
+                String authToken = ctx.header("Authorization");
+                CreateGameResult result = gameService.createGame(request, authToken);
+                ctx.status(200).result(gson.toJson(result)).contentType("application/json");
+            } catch (ServiceException e) {
+                if (e.getMessage().contains("unauthorized")) {
+                    ctx.status(401).result(gson.toJson(Map.of("message", "Error: unauthorized"))).contentType("application/json");
+                } else if (e.getMessage().contains("bad request")) {
+                    ctx.status(400).result(gson.toJson(Map.of("message", "Error: bad request"))).contentType("application/json");
+                } else {
+                    ctx.status(500).result(gson.toJson(Map.of("message", "Error: " + e.getMessage()))).contentType("application/json");
+                }
+            }
+        });
 
+        javalin.put("/game", ctx -> {
+            try {
+                JoinGameRequest request = gson.fromJson(ctx.body(), JoinGameRequest.class);
+                String authToken = ctx.header("Authorization");
+                gameService.joinGame(request, authToken);
+                ctx.status(200);
+            } catch (ServiceException e) {
+                if (e.getMessage().contains("unauthorized")) {
+                    ctx.status(401).result(gson.toJson(Map.of("message", "Error: unauthorized"))).contentType("application/json");
+                } else if (e.getMessage().contains("bad request")) {
+                    ctx.status(400).result(gson.toJson(Map.of("message", "Error: bad request"))).contentType("application/json");
+                } else if (e.getMessage().contains("already taken")) {
+                    ctx.status(403).result(gson.toJson(Map.of("message", "Error: already taken"))).contentType("application/json");
+                } else {
+                    ctx.status(500).result(gson.toJson(Map.of("message", "Error: " + e.getMessage()))).contentType("application/json");
+                }
+            }
+        });
 
     }
 
