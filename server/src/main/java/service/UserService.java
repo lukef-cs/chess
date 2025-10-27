@@ -5,6 +5,7 @@ import dataaccess.user.UserDAO;
 import dataaccess.DataAccessException;
 import model.AuthData;
 import model.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 import service.requests.LoginRequest;
 import service.requests.LogoutRequest;
 import service.requests.RegisterRequest;
@@ -63,7 +64,7 @@ public class UserService {
 
             // Check credentials
             UserData user = userDAO.getUser(request.username());
-            if (user == null || !user.password().equals(request.password())) {
+            if (user == null || !verifyUser(user, request.password())) {
                 throw new ServiceException("Error: unauthorized");
             }
 
@@ -77,6 +78,11 @@ public class UserService {
             throw new ServiceException("Error: " + e.getMessage());
         }
     }
+
+    private boolean verifyUser(UserData user, String passwordReq){
+        var hashedPassword = user.password();
+        return BCrypt.checkpw(passwordReq, hashedPassword);
+    };
 
     public void logout(LogoutRequest request) throws ServiceException {
         try {

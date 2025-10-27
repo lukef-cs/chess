@@ -1,12 +1,17 @@
 package server;
 
 import com.google.gson.Gson;
+
+import dataaccess.DatabaseManager;
 import dataaccess.auth.AuthDAO;
 import dataaccess.auth.MemoryAuthDAO;
+import dataaccess.auth.SqlAuthDAO;
 import dataaccess.game.GameDAO;
 import dataaccess.game.MemoryGameDAO;
+import dataaccess.game.SqlGameDAO;
 import dataaccess.user.UserDAO;
 import dataaccess.user.MemoryUserDAO;
+import dataaccess.user.SqlUserDAO;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 import service.ClearService;
@@ -37,10 +42,21 @@ public class Server {
     private ClearService clearService;
 
     public Server() {
+        try {
+            DatabaseManager.createDatabase();
+            DatabaseManager.createTables();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to initialize database", e);
+        }
+
         // Initialize data access objects
-        UserDAO userDAO = new MemoryUserDAO();
-        AuthDAO authDAO = new MemoryAuthDAO();
-        GameDAO gameDAO = new MemoryGameDAO();
+        // UserDAO userDAO = new MemoryUserDAO();
+        // AuthDAO authDAO = new MemoryAuthDAO();
+        // GameDAO gameDAO = new MemoryGameDAO();
+
+        UserDAO userDAO = new SqlUserDAO();
+        AuthDAO authDAO = new SqlAuthDAO();
+        GameDAO gameDAO = new SqlGameDAO();
 
         // Initialize services
         userService = new UserService(userDAO, authDAO);
