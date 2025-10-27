@@ -102,12 +102,12 @@ public class DatabaseManager {
 
             var gamesTableStatement = "CREATE TABLE IF NOT EXISTS games (" +
                     "game_id INT AUTO_INCREMENT PRIMARY KEY," +
-                    "player_white VARCHAR(50)," +
-                    "player_black VARCHAR(50)," +
+                    "white_username VARCHAR(50)," +
+                    "black_username VARCHAR(50)," +
                     "game_name VARCHAR(100) NOT NULL," +
                     "game_state BLOB," +
-                    "FOREIGN KEY (player_white) REFERENCES users(username) ON DELETE SET NULL," +
-                    "FOREIGN KEY (player_black) REFERENCES users(username) ON DELETE SET NULL" +
+                    "FOREIGN KEY (white_username) REFERENCES users(username) ON DELETE SET NULL," +
+                    "FOREIGN KEY (black_username) REFERENCES users(username) ON DELETE SET NULL" +
                     ")";
             try (var statement = conn.prepareStatement(gamesTableStatement)) {
                 statement.executeUpdate();
