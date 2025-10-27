@@ -52,6 +52,11 @@ public class DatabaseManager {
         }
     }
 
+    public static Connection getPublicConnection() throws DataAccessException {
+        // so i can use it in my DAO folders
+        return getConnection();
+    }
+
     private static void loadPropertiesFromResources() {
         try (var propStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("db.properties")) {
             if (propStream == null) {
