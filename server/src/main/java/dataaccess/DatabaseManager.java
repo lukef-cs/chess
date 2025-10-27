@@ -105,7 +105,7 @@ public class DatabaseManager {
                     "white_username VARCHAR(50)," +
                     "black_username VARCHAR(50)," +
                     "game_name VARCHAR(100) NOT NULL," +
-                    "game_state BLOB," +
+                    "game_state TEXT," +
                     "FOREIGN KEY (white_username) REFERENCES users(username) ON DELETE SET NULL," +
                     "FOREIGN KEY (black_username) REFERENCES users(username) ON DELETE SET NULL" +
                     ")";
