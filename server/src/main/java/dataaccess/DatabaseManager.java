@@ -74,4 +74,41 @@ public class DatabaseManager {
         var port = Integer.parseInt(props.getProperty("db.port"));
         connectionUrl = String.format("jdbc:mysql://%s:%d", host, port);
     }
+
+    public static void createTables() throws DataAccessException {
+        try (var conn = getConnection()) {
+            var userTableStatement = "CREATE TABLE IF NOT EXISTS users (" +
+                    "username VARCHAR(50) PRIMARY KEY," +
+                    "password_hash VARCHAR(225) NOT NULL," +
+                    "email VARCHAR(100) NOT NULL" +
+                    ")";
+            try (var statement = conn.prepareStatement(userTableStatement)) {
+                statement.executeUpdate();
+            }
+
+            var authTableStatement = "CREATE TABLE IF NOT EXISTS auth (" +
+                    "auth_token VARCHAR(100) PRIMARY KEY," +
+                    "username VARCHAR(50) NOT NULL," +
+                    "FOREIGN KEY (username) REFERENCES users(username) ON DELETE CASCADE" +
+                    ")";
+            try (var statement = conn.prepareStatement(authTableStatement)) {
+                statement.executeUpdate();
+            }
+
+            var gamesTableStatement = "CREATE TABLE IF NOT EXISTS games (" +
+                    "game_id INT AUTO_INCREMENT PRIMARY KEY," +
+                    "player_white VARCHAR(50)," +
+                    "player_black VARCHAR(50)," +
+                    "game_name VARCHAR(100) NOT NULL," +
+                    "game_state BLOB," +
+                    "FOREIGN KEY (player_white) REFERENCES users(username) ON DELETE SET NULL," +
+                    "FOREIGN KEY (player_black) REFERENCES users(username) ON DELETE SET NULL" +
+                    ")";
+            try (var statement = conn.prepareStatement(gamesTableStatement)) {
+                statement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("failed to create tables", e);
+        }
+    }
 }
