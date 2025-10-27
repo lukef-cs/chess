@@ -20,8 +20,9 @@ public class SqlUserDAO implements UserDAO{
             statement.setString(1, user.username());
             statement.setString(2, hashedPassword);
             statement.setString(3, user.email());
+            statement.executeUpdate();
         } catch (SQLException e) {
-            throw new DataAccessException("Failed to insert user", e);
+            throw new DataAccessException("Failed to create user", e);
         };
     }
 
