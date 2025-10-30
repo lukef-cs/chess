@@ -27,6 +27,7 @@ import service.results.CreateGameResult;
 import service.results.ListGamesResult;
 import service.results.LoginResult;
 import service.results.RegisterResult;
+import model.AuthData;
 
 import java.util.Map;
 
@@ -40,6 +41,8 @@ public class Server {
     private UserService userService;
     private GameService gameService;
     private ClearService clearService;
+
+    private AuthDAO authDAO;
 
     public Server() {
         try {
@@ -55,7 +58,7 @@ public class Server {
         // GameDAO gameDAO = new MemoryGameDAO();
 
         UserDAO userDAO = new SqlUserDAO();
-        AuthDAO authDAO = new SqlAuthDAO();
+        authDAO = new SqlAuthDAO();
         GameDAO gameDAO = new SqlGameDAO();
 
         // Initialize services
@@ -68,6 +71,19 @@ public class Server {
 
         // Set up endpoints
         setupRoutes();
+    }
+
+    private void checkAuth(String authToken, Context ctx) throws ServiceException {
+        try{
+            AuthData auth = authDAO.getAuth(authToken);
+            if (auth == null) {
+                ctx.status(401).result(gson.toJson(Map.of("message", "Error: unauthorized"))).contentType("application/json");
+                return;
+            }
+        } catch(Exception e){
+            ctx.status(401).result(gson.toJson(Map.of("message", "Error: unauthorized"))).contentType("application/json");
+            return;
+        }
     }
 
     private void setupRoutes() {
@@ -126,21 +142,20 @@ public class Server {
     private void handleLogout(Context ctx) {
         try {
             String authToken = ctx.header("Authorization");
-            if (authToken == null) {
-                ctx.status(401).result(gson.toJson(Map.of("message", "Error: unauthorized"))).contentType("application/json");
-                return;
-            }
+            checkAuth(authToken, ctx);
+
             LogoutRequest request = new LogoutRequest(authToken);
             userService.logout(request);
             ctx.status(200);
         } catch (ServiceException e) {
-            ctx.status(401).result(gson.toJson(Map.of("message", "Error: unauthorized"))).contentType("application/json");
+            returnStatus(e, ctx);
         }
     }
 
     private void handleCreateGame(Context ctx) {
         try {
             String authToken = ctx.header("Authorization");
+            checkAuth(authToken, ctx);
             CreateGameRequest request = gson.fromJson(ctx.body(), CreateGameRequest.class);
             CreateGameResult result = gameService.createGame(request, authToken);
             ctx.status(200).result(gson.toJson(result)).contentType("application/json");
@@ -152,16 +167,18 @@ public class Server {
     private void handleListGames(Context ctx) {
         try {
             String authToken = ctx.header("Authorization");
+            checkAuth(authToken, ctx);
             ListGamesResult result = gameService.listGames(authToken);
             ctx.status(200).result(gson.toJson(result)).contentType("application/json");
         } catch (ServiceException e) {
-            ctx.status(401).result(gson.toJson(Map.of("message", "Error: unauthorized"))).contentType("application/json");
+            returnStatus(e, ctx);
         }
     }
 
     private void handleJoinGame(Context ctx) {
         try {
             String authToken = ctx.header("Authorization");
+            checkAuth(authToken, ctx);
             JoinGameRequest request = gson.fromJson(ctx.body(), JoinGameRequest.class);
             gameService.joinGame(request, authToken);
             ctx.status(200);

@@ -14,9 +14,6 @@ import service.requests.LoginRequest;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * Unit tests for ClearService class to clear all data from the database
- */
 public class ClearServiceTest {
     private ClearService clearService;
     private UserDAO userDAO;
@@ -44,39 +41,30 @@ public class ClearServiceTest {
         gameService.createGame(new CreateGameRequest("Game 2"), user1Token);
     }
 
-    // Clear Tests
-
     @Test
     public void testClearPositive() throws Exception {
-        // Arrange - get valid auth token so we can make the clear call
         String validToken = userService.login(new LoginRequest("hello", "pass1")).authToken();
 
-        // Verify data exists before clear
+
         assertNotNull(userDAO.getUser("hello"));
         assertNotNull(userDAO.getUser("there"));
         assertEquals(2, gameService.listGames(validToken).games().size());
 
-        // Call the function
         clearService.clear();
 
-        // Assert - all data should be cleared
         assertNull(userDAO.getUser("hello"));
         assertNull(userDAO.getUser("there"));
 
-        // Verify all games list is empty
         assertTrue(gameDAO.listGames().isEmpty());
     }
 
     @Test
     public void testClearRemovesAuthTokens() throws Exception {
-        // Arrange - get an auth token
         String authToken = userService.login(new LoginRequest("hello", "pass1")).authToken();
         assertNotNull(authDAO.getAuth(authToken));
 
-        // Call the function
         clearService.clear();
 
-        // Assert - auth token should be removed
         assertNull(authDAO.getAuth(authToken));
     }
 
