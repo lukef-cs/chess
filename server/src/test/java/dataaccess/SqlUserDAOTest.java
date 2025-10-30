@@ -61,7 +61,7 @@ public class SqlUserDAOTest {
     public void testCreateUserNegative() {
         UserData duplicateUser = new UserData("testUser", "anotherPassword", "tu@luke.com");
 
-        assertThrows(DataAccessException.class, () -> userDAO.createUser(duplicateUser), "Creating user with duplicate username should throw exception");
+        assertThrows(DataAccessException.class, () -> userDAO.createUser(duplicateUser), "Duplicate user should throw exception");
     }
 
     @Test

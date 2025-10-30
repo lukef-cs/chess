@@ -52,11 +52,6 @@ public class Server {
             throw new RuntimeException("Failed to initialize database", e);
         }
 
-        // Initialize data access objects
-        // UserDAO userDAO = new MemoryUserDAO();
-        // AuthDAO authDAO = new MemoryAuthDAO();
-        // GameDAO gameDAO = new MemoryGameDAO();
-
         UserDAO userDAO = new SqlUserDAO();
         authDAO = new SqlAuthDAO();
         GameDAO gameDAO = new SqlGameDAO();
