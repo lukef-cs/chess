@@ -61,4 +61,16 @@ public class ServerFacade {
         return makeRequest("POST", path, body, null, AuthData.class);
     };
 
+    public AuthData login(String username, String password) throws Exception {
+        var path = "/session";
+        var body = new LoginRequest(username, password);
+        return makeRequest("POST", path, body, null, AuthData.class);
+    }
+
+    public void logout(String authToken) throws Exception {
+        var path = "/session";
+        var body = new LogoutRequest(authToken);
+        makeRequest("DELETE", path, body,  authToken, null);
+    }
+
 }
