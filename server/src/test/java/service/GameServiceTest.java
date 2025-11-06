@@ -9,12 +9,12 @@ import dataaccess.user.MemoryUserDAO;
 import model.GameData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import service.requests.CreateGameRequest;
-import service.requests.JoinGameRequest;
-import service.requests.RegisterRequest;
-import service.requests.LoginRequest;
-import service.results.CreateGameResult;
-import service.results.ListGamesResult;
+import requests.CreateGameRequest;
+import requests.JoinGameRequest;
+import requests.RegisterRequest;
+import requests.LoginRequest;
+import results.CreateGameResult;
+import results.ListGamesResult;
 
 import java.util.List;
 

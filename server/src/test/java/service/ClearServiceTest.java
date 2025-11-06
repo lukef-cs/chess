@@ -8,9 +8,9 @@ import dataaccess.user.UserDAO;
 import dataaccess.user.MemoryUserDAO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import service.requests.CreateGameRequest;
-import service.requests.RegisterRequest;
-import service.requests.LoginRequest;
+import requests.CreateGameRequest;
+import requests.RegisterRequest;
+import requests.LoginRequest;
 
 import static org.junit.jupiter.api.Assertions.*;
 

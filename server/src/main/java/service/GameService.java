@@ -6,10 +6,10 @@ import dataaccess.game.GameDAO;
 import dataaccess.DataAccessException;
 import model.AuthData;
 import model.GameData;
-import service.requests.CreateGameRequest;
-import service.requests.JoinGameRequest;
-import service.results.CreateGameResult;
-import service.results.ListGamesResult;
+import requests.CreateGameRequest;
+import requests.JoinGameRequest;
+import results.CreateGameResult;
+import results.ListGamesResult;
 import java.util.List;
 
 public class GameService {
