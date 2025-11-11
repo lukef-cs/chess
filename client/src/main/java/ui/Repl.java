@@ -101,7 +101,17 @@ public class Repl {
             case "create" -> {
                 if (tokens.length < 2) yield "Expected: create <NAME>";
                 var result = server.createGame(tokens[1], authToken);
-                yield "Created game with ID: " + result.gameID();
+                var listResult = server.listGames(authToken);
+                currentGameList = listResult.games();
+
+                int position = 0;
+                for (int i = 0; i < currentGameList.size(); i++) {
+                    if (currentGameList.get(i).gameID() == result.gameID()) {
+                        position = i + 1;
+                        break;
+                    }
+                }
+                yield "Created game '" + tokens[1] + "' (use 'list' to see all games, or 'join " + position + " [WHITE|BLACK]')";
             }
             case "list" -> {
                 var result = server.listGames(authToken);
