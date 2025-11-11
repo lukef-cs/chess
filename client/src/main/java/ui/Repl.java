@@ -1,6 +1,9 @@
 package ui;
 
 import java.util.*;
+
+import chess.ChessPiece;
+import chess.ChessPosition;
 import model.GameData;
 import results.ListGamesResult;
 import client.ServerFacade;
@@ -146,6 +149,79 @@ public class Repl {
     }
 
     private String drawBoard(GameData game, String perspective) {
-        return "Board drawing coming soon...";
+        var board = game.game().getBoard();
+        boolean isWhitePerspective = perspective.equalsIgnoreCase("WHITE");
+        StringBuilder sb = new StringBuilder();
+
+        // column headers
+        sb.append("   ");
+        for (int col = 0; col < 8; col++) {
+            char letter = (char) ('a' + (isWhitePerspective ? col : 7 - col));
+            sb.append(" ").append(letter).append(" ");
+        }
+        sb.append("\n");
+
+        for (int row = 0; row < 8; row++) {
+            int displayRow = isWhitePerspective ? (8 - row) : (row + 1);
+            sb.append(" ").append(displayRow).append(" ");
+
+            for (int col = 0; col < 8; col++) {
+                int r = isWhitePerspective ? (7 - row) : row;
+                int c = isWhitePerspective ? col : (7 - col);
+                ChessPosition position = new ChessPosition(r + 1, c + 1);
+                ChessPiece piece = board.getPiece(position);
+
+                boolean isLightSquare = (r + c) % 2 == 0;
+                sb.append(isLightSquare ? EscapeSequences.SET_BG_COLOR_WHITE : EscapeSequences.SET_BG_COLOR_BLACK );
+
+                if (piece != null){
+                    sb.append(getPieceSymbol(piece));
+                } else {
+                    sb.append(EscapeSequences.EMPTY);
+                }
+
+                sb.append(EscapeSequences.RESET_BG_COLOR);
+            }
+
+            sb.append(" ").append(displayRow).append("\n");
+        }
+
+        // column headers again
+        sb.append("   ");
+        for (int col = 0; col < 8; col++) {
+            char letter = (char) ('a' + (isWhitePerspective ? col : 7 - col));
+            sb.append(" ").append(letter).append(" ");
+        }
+        sb.append("\n");
+
+        return sb.toString();
+    }
+
+    private String getPieceSymbol(ChessPiece piece) {
+        boolean isWhite = piece.getTeamColor() == chess.ChessGame.TeamColor.WHITE;
+        String symbol;
+        switch (piece.getPieceType()) {
+            case KING:
+                symbol = isWhite ? EscapeSequences.WHITE_KING : EscapeSequences.BLACK_KING;
+                break;
+            case QUEEN:
+                symbol = isWhite ? EscapeSequences.WHITE_QUEEN : EscapeSequences.BLACK_QUEEN;
+                break;
+            case ROOK:
+                symbol = isWhite ? EscapeSequences.WHITE_ROOK : EscapeSequences.BLACK_ROOK;
+                break;
+            case BISHOP:
+                symbol = isWhite ? EscapeSequences.WHITE_BISHOP : EscapeSequences.BLACK_BISHOP;
+                break;
+            case KNIGHT:
+                symbol = isWhite ? EscapeSequences.WHITE_KNIGHT : EscapeSequences.BLACK_KNIGHT;
+                break;
+            case PAWN:
+                symbol = isWhite ? EscapeSequences.WHITE_PAWN : EscapeSequences.BLACK_PAWN;
+                break;
+            default:
+                symbol = "?";
+        }
+        return symbol;
     }
 }
