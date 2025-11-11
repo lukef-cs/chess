@@ -64,14 +64,18 @@ public class Repl {
                     help - with possible commands
                     """;
             case "register" -> {
-                if (tokens.length < 4) yield "Expected: register <USERNAME> <PASSWORD> <EMAIL>";
+                if (tokens.length < 4){
+                    yield "Expected: register <USERNAME> <PASSWORD> <EMAIL>";
+                }
                 var auth = server.register(tokens[1], tokens[2], tokens[3]);
                 authToken = auth.authToken();
                 state = State.POSTLOGIN;
                 yield "Logged in as " + tokens[1];
             }
             case "login" -> {
-                if (tokens.length < 3) yield "Expected: login <USERNAME> <PASSWORD>";
+                if (tokens.length < 3) {
+                    yield "Expected: login <USERNAME> <PASSWORD>";
+                }
                 var auth = server.login(tokens[1], tokens[2]);
                 authToken = auth.authToken();
                 state = State.POSTLOGIN;
@@ -99,7 +103,9 @@ public class Repl {
                 yield "Logged out successfully";
             }
             case "create" -> {
-                if (tokens.length < 2) yield "Expected: create <NAME>";
+                if (tokens.length < 2) {
+                    yield "Expected: create <NAME>";
+                }
                 var result = server.createGame(tokens[1], authToken);
                 var listResult = server.listGames(authToken);
                 currentGameList = listResult.games();
@@ -119,7 +125,9 @@ public class Repl {
                 yield formatGameList();
             }
             case "join" -> {
-                if (tokens.length < 3) yield "Expected: join <ID> [WHITE|BLACK]";
+                if (tokens.length < 3) {
+                    yield "Expected: join <ID> [WHITE|BLACK]";
+                }
                 int gameNum = Integer.parseInt(tokens[1]);
                 if (gameNum < 1 || gameNum > currentGameList.size()) {
                     yield "Invalid game number. Use 'list' to see games.";
@@ -129,7 +137,9 @@ public class Repl {
                 yield "Joined game as " + tokens[2] + "\n" + drawBoard(game, tokens[2]);
             }
             case "observe" -> {
-                if (tokens.length < 2) yield "Expected: observe <ID>";
+                if (tokens.length < 2){
+                     yield "Expected: observe <ID>";
+                }
                 int gameNum = Integer.parseInt(tokens[1]);
                 if (gameNum < 1 || gameNum > currentGameList.size()) {
                     yield "Invalid game number. Use 'list' to see games.";
