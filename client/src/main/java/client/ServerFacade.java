@@ -37,9 +37,6 @@ public class ServerFacade {
 
         var response = client.send(requestBuilder.build(), HttpResponse.BodyHandlers.ofString());
 
-        System.out.println("DEBUG: HTTP Status: " + response.statusCode());  // Debug
-        System.out.println("DEBUG: Response Body: " + response.body());     // Debug
-
         if(response.statusCode() >= 400){
             throw new Exception(
                 "Error: " + response.body()
@@ -61,11 +58,9 @@ public class ServerFacade {
     }
 
     public AuthData register(String username, String password, String email) throws Exception {
-        System.out.println("DEBUG: Calling register for " + username);  // Debug
         var path = "/user";
         var body = new RegisterRequest(username, password, email);
         var result = makeRequest("POST", path, body, null, AuthData.class);
-        System.out.println("DEBUG: Register result: " + result);  // Debug
         if (result != null) {
             System.out.println("DEBUG: Auth token: " + result.authToken());  // Debug
         }
