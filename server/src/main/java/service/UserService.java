@@ -37,11 +37,12 @@ public class UserService {
             // Check if user already exists
             UserData existingUser = userDAO.getUser(request.username());
             if (existingUser != null) {
-                throw new ServiceException("Error: already taken");
+                throw new ServiceException("Error: already exists");
             }
 
             // Create new user
-            UserData newUser = new UserData(request.username(), request.password(), request.email());
+            String hashedPassword = BCrypt.hashpw(request.password(), BCrypt.gensalt());
+            UserData newUser = new UserData(request.username(), hashedPassword, request.email());
             userDAO.createUser(newUser);
 
             // Create auth token
@@ -65,7 +66,7 @@ public class UserService {
             // Check credentials
             UserData user = userDAO.getUser(request.username());
             if (user == null || !verifyUser(user, request.password())) {
-                throw new ServiceException("Error: unauthorized");
+                throw new ServiceException("Error: invalid credentials");
             }
 
             // Create auth token
@@ -80,8 +81,13 @@ public class UserService {
     }
 
     private boolean verifyUser(UserData user, String passwordReq){
+
         var hashedPassword = user.password();
-        return BCrypt.checkpw(passwordReq, hashedPassword);
+        boolean result = BCrypt.checkpw(passwordReq, hashedPassword);
+        System.out.println("Password provided: " + passwordReq);  // Debug
+        System.out.println("Hash stored: " + hashedPassword);  // Debug
+        System.out.println("BCrypt check result: " + result);  // Debug
+        return result;
     };
 
     public void logout(LogoutRequest request) throws ServiceException {

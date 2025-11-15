@@ -2,8 +2,6 @@ package dataaccess.user;
 
 import java.sql.SQLException;
 
-import org.mindrot.jbcrypt.BCrypt;
-
 import dataaccess.DataAccessException;
 import dataaccess.DatabaseManager;
 import model.UserData;
@@ -13,12 +11,11 @@ public class SqlUserDAO implements UserDAO{
 
     @Override
     public void createUser(UserData user) throws DataAccessException {
-        var hashedPassword = BCrypt.hashpw(user.password(), BCrypt.gensalt());
         var sql = "INSERT INTO users (username, password_hash, email) VALUES (?, ?, ?)";
         try (var conn = DatabaseManager.getPublicConnection();
             var statement = conn.prepareStatement(sql)){
             statement.setString(1, user.username());
-            statement.setString(2, hashedPassword);
+            statement.setString(2, user.password());  // Already hashed in service layer
             statement.setString(3, user.email());
             statement.executeUpdate();
         } catch (SQLException e) {

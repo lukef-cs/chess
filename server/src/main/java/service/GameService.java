@@ -81,14 +81,14 @@ public class GameService {
             String playerColor = request.playerColor().toUpperCase();
             if ("WHITE".equals(playerColor)) {
                 if (game.whiteUsername() != null) {
-                    throw new ServiceException("Error: already taken");
+                    throw new ServiceException("Error: color already taken");
                 }
                 GameData updatedGame = new GameData(game.gameID(), authData.username(),
                         game.blackUsername(), game.gameName(), game.game());
                 gameDAO.updateGame(updatedGame);
             } else if ("BLACK".equals(playerColor)) {
                 if (game.blackUsername() != null) {
-                    throw new ServiceException("Error: already taken");
+                    throw new ServiceException("Error: color already taken");
                 }
                 GameData updatedGame = new GameData(game.gameID(), game.whiteUsername(),
                         authData.username(), game.gameName(), game.game());

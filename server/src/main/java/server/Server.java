@@ -98,7 +98,7 @@ public class Server {
 
     private void returnStatus(ServiceException e, Context ctx) {
         String message = e.getMessage();
-        if (message.contains("unauthorized")) {
+        if (message.contains("unauthorized") || message.contains("invalid credentials")) {
             ctx.status(401).result(gson.toJson(Map.of("message", "Error: unauthorized"))).contentType("application/json");
         } else if (message.contains("bad request")) {
             ctx.status(400).result(gson.toJson(Map.of("message", "Error: bad request"))).contentType("application/json");
@@ -116,8 +116,8 @@ public class Server {
             String message = e.getMessage();
             if (message.contains("bad request")) {
                 ctx.status(400).result(gson.toJson(Map.of("message", "Error: bad request"))).contentType("application/json");
-            } else if (message.contains("already taken")) {
-                ctx.status(403).result(gson.toJson(Map.of("message", "Error: already taken"))).contentType("application/json");
+            } else if (message.contains("already exists")) {
+                ctx.status(403).result(gson.toJson(Map.of("message", "Error: already exists"))).contentType("application/json");
             } else {
                 ctx.status(500).result(gson.toJson(Map.of("message", message))).contentType("application/json");
             }

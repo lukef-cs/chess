@@ -13,6 +13,7 @@ import requests.LogoutRequest;
 import requests.RegisterRequest;
 import results.LoginResult;
 import results.RegisterResult;
+import org.mindrot.jbcrypt.BCrypt;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -43,7 +44,7 @@ public class UserServiceTest {
         UserData user = userDAO.getUser("testuser");
         assertNotNull(user);
         assertEquals("testuser", user.username());
-        assertEquals("password123", user.password());
+        assertTrue(BCrypt.checkpw("password123", user.password()));
         assertEquals("test@example.com", user.email());
     }
 
@@ -57,7 +58,7 @@ public class UserServiceTest {
             userService.register(request2);
             fail("Expected ServiceException for duplicate username");
         } catch (ServiceException e) {
-            assertTrue(e.getMessage().contains("already taken"));
+            assertTrue(e.getMessage().contains("already exists"));
         }
     }
 
@@ -88,7 +89,7 @@ public class UserServiceTest {
             userService.login(loginRequest);
             fail("Expected ServiceException for wrong password");
         } catch (ServiceException e) {
-            assertTrue(e.getMessage().contains("unauthorized"));
+            assertTrue(e.getMessage().contains("invalid credentials"));
         }
     }
 

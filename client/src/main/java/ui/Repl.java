@@ -20,6 +20,13 @@ public class Repl {
         this.server = new ServerFacade(serverUrl);
     }
 
+    private void getUpdatedGameList(String authToken) throws Exception{
+        var listResult = server.listGames(authToken);
+        currentGameList = listResult.games();
+    }
+
+
+
     public void run() {
         System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE +
                           "♕ Welcome to 240 Chess. Type Help to get started. ♕");
@@ -64,7 +71,7 @@ public class Repl {
                     help - with possible commands
                     """;
             case "register" -> {
-                if (tokens.length < 4){
+                if (tokens.length != 4){
                     yield "Expected: register <USERNAME> <PASSWORD> <EMAIL>";
                 }
                 var auth = server.register(tokens[1], tokens[2], tokens[3]);
@@ -73,7 +80,7 @@ public class Repl {
                 yield "Logged in as " + tokens[1];
             }
             case "login" -> {
-                if (tokens.length < 3) {
+                if (tokens.length != 3) {
                     yield "Expected: login <USERNAME> <PASSWORD>";
                 }
                 var auth = server.login(tokens[1], tokens[2]);
@@ -103,7 +110,7 @@ public class Repl {
                 yield "Logged out successfully";
             }
             case "create" -> {
-                if (tokens.length < 2) {
+                if (tokens.length != 2) {
                     yield "Expected: create <NAME>";
                 }
                 var result = server.createGame(tokens[1], authToken);
@@ -125,21 +132,35 @@ public class Repl {
                 yield formatGameList();
             }
             case "join" -> {
-                if (tokens.length < 3) {
+                if (tokens.length != 3 ) {
                     yield "Expected: join <ID> [WHITE|BLACK]";
                 }
+                if (!tokens[1].matches("\\d+")) {
+                    yield "Game ID must be a number. Use 'list' to see games.";
+                }
+                getUpdatedGameList(authToken);
                 int gameNum = Integer.parseInt(tokens[1]);
                 if (gameNum < 1 || gameNum > currentGameList.size()) {
                     yield "Invalid game number. Use 'list' to see games.";
+                }
+
+                String color = tokens[2].toUpperCase();
+                if(!(color.equals("WHITE") || color.equals("BLACK"))){
+                    yield "Must join game as white or black";
                 }
                 var game = currentGameList.get(gameNum - 1);
                 server.joinGame(game.gameID(), tokens[2].toUpperCase(), authToken);
                 yield "Joined game as " + tokens[2] + "\n" + drawBoard(game, tokens[2]);
             }
             case "observe" -> {
-                if (tokens.length < 2){
+                if (tokens.length != 2){
                      yield "Expected: observe <ID>";
                 }
+                // check if number
+                if (!tokens[1].matches("\\d+")) {
+                    yield "Game ID must be a number. Use 'list' to see games.";
+                }
+                getUpdatedGameList(authToken);
                 int gameNum = Integer.parseInt(tokens[1]);
                 if (gameNum < 1 || gameNum > currentGameList.size()) {
                     yield "Invalid game number. Use 'list' to see games.";
@@ -191,8 +212,8 @@ public class Repl {
                 ChessPosition position = new ChessPosition(r + 1, c + 1);
                 ChessPiece piece = board.getPiece(position);
 
-                boolean isLightSquare = (r + c) % 2 == 0;
-                sb.append(isLightSquare ? EscapeSequences.SET_BG_COLOR_WHITE : EscapeSequences.SET_BG_COLOR_BLACK );
+                boolean isDarkSquare = (r + c) % 2 == 0;
+                sb.append(isDarkSquare ? EscapeSequences.SET_BG_COLOR_BLACK : EscapeSequences.SET_BG_COLOR_WHITE );
 
                 if (piece != null){
                     sb.append(getPieceSymbol(piece));

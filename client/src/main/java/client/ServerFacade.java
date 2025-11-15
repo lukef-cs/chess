@@ -1,6 +1,7 @@
 package client;
 
 import java.net.http.HttpClient;
+import java.io.IOException;
 import java.net.URI;
 import model.AuthData;
 import model.GameData;
@@ -35,18 +36,52 @@ public class ServerFacade {
             requestBuilder.method(method, HttpRequest.BodyPublishers.noBody());
         }
 
-        var response = client.send(requestBuilder.build(), HttpResponse.BodyHandlers.ofString());
+        try {
 
-        if(response.statusCode() >= 400){
-            throw new Exception(
-                "Error: " + response.body()
-            );
-        }
+            var response = client.send(requestBuilder.build(), HttpResponse.BodyHandlers.ofString());
 
-        if(responseClass != null && !response.body().isEmpty()) {
-            return gson.fromJson(response.body(), responseClass);
+            if (response.statusCode() >= 400) {
+                // Parse the error message from JSON: {"message": "Error: bad request"}
+                String userFriendlyMessage = "An unknown error occurred.";
+                try {
+                    var errorMap = gson.fromJson(response.body(), java.util.Map.class);
+                    String rawMessage = (String) errorMap.get("message");
+                    if (rawMessage != null) {
+                        // Map server error messages to user-friendly ones
+                        if (rawMessage.contains("bad request")) {
+                            userFriendlyMessage = "Invalid input. Please check your command and try again.";
+                        } else if (rawMessage.contains("unauthorized")) {
+                            userFriendlyMessage = "You are not logged in or your session has expired. Please log in again.";
+                        } else if (rawMessage.contains("color already taken")) {
+                            userFriendlyMessage = "That color is already taken in this game.";
+                        } else if (rawMessage.contains("already exists")) {
+                            userFriendlyMessage = "A user with that username already exists.";
+                        } else if (rawMessage.contains("invalid credentials")) {
+                            userFriendlyMessage = "Invalid username or password. Please try again.";
+                        } else {
+                            // Use the raw message if it starts with "Error:" (strip it for readability)
+                            userFriendlyMessage = rawMessage.startsWith("Error: ") ? rawMessage.substring(7) : rawMessage;
+                        }
+                    }
+                } catch (Exception e) {
+                    // If JSON parsing fails, use a generic message
+                    userFriendlyMessage = "Server error. Please try again later.";
+                }
+                throw new Exception(userFriendlyMessage);
+            }
+
+            if(responseClass != null && !response.body().isEmpty()) {
+                return gson.fromJson(response.body(), responseClass);
+            }
+            return null;
+        } catch (IOException e) {
+            // Handle connection failures (server down, network issues)
+            throw new Exception("Unable to connect to the server. Please check if the server is running and try again.");
+        } catch (InterruptedException e) {
+            // Handle interruptions (e.g., thread interrupted)
+            Thread.currentThread().interrupt();
+            throw new Exception("Request was interrupted. Please try again.");
         }
-        return null;
     }
 
     public ServerFacade(String serverString) {
@@ -61,11 +96,13 @@ public class ServerFacade {
         var path = "/user";
         var body = new RegisterRequest(username, password, email);
         var result = makeRequest("POST", path, body, null, AuthData.class);
-        if (result != null) {
-            System.out.println("DEBUG: Auth token: " + result.authToken());  // Debug
-        }
+
         return result;
     }
+
+    // if theres too many params, print the "expected" string
+    // bottom right square should always be white
+    // shouldn't show json objects for error messages
 
     public AuthData login(String username, String password) throws Exception {
         var path = "/session";

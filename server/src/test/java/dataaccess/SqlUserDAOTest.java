@@ -32,7 +32,8 @@ public class SqlUserDAOTest {
 
         userDAO.clear();
 
-        UserData testUser = new UserData("testUser", "validPassword", "tu@luke.com");
+        String hashedPassword = BCrypt.hashpw("validPassword", BCrypt.gensalt());
+        UserData testUser = new UserData("testUser", hashedPassword, "tu@luke.com");
 
         userDAO.createUser(testUser);
     }
@@ -47,7 +48,8 @@ public class SqlUserDAOTest {
 
     @Test
     public void testCreateUserPositive() throws DataAccessException {
-        UserData newUser = new UserData("newUser", "newPassword", "nu@luke.com");
+        String hashedPassword = BCrypt.hashpw("newPassword", BCrypt.gensalt());
+        UserData newUser = new UserData("newUser", hashedPassword, "nu@luke.com");
         userDAO.createUser(newUser);
 
         UserData retrieved = userDAO.getUser("newUser");
