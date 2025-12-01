@@ -65,7 +65,7 @@ public class Server {
         clearService = new ClearService(userDAO, gameDAO, authDAO);
 
         // Initialize WebSocket handler
-        webSocketHandler = new WebSocketHandler();
+        webSocketHandler = new WebSocketHandler(userDAO, authDAO, gameDAO);
 
         // Create Javalin server
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
