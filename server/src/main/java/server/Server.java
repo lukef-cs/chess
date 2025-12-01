@@ -18,6 +18,7 @@ import service.ClearService;
 import service.GameService;
 import service.ServiceException;
 import service.UserService;
+import websocket.WebSocketHandler;
 import requests.CreateGameRequest;
 import requests.JoinGameRequest;
 import requests.LoginRequest;
@@ -42,6 +43,8 @@ public class Server {
     private GameService gameService;
     private ClearService clearService;
 
+    private WebSocketHandler webSocketHandler;
+
     private AuthDAO authDAO;
 
     public Server() {
@@ -60,6 +63,9 @@ public class Server {
         userService = new UserService(userDAO, authDAO);
         gameService = new GameService(gameDAO, authDAO);
         clearService = new ClearService(userDAO, gameDAO, authDAO);
+
+        // Initialize WebSocket handler
+        webSocketHandler = new WebSocketHandler();
 
         // Create Javalin server
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
@@ -94,6 +100,10 @@ public class Server {
 
         // Database endpoints
         javalin.delete("/db", ctx -> handleClear(ctx));
+
+        javalin.ws("/ws", ws -> {
+            ws.onMessage(webSocketHandler::handleConnection);
+        });
     }
 
     private void returnStatus(ServiceException e, Context ctx) {
