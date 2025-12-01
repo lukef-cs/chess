@@ -57,7 +57,7 @@ public class Repl implements ServerMessageObserver{
             }
             case NOTIFICATION -> {
                 NotificationMessage notifMsg = (NotificationMessage) message;
-                System.out.println("\n" + EscapeSequences.SET_TEXT_COLOR_BLUE + notifMsg.getNotification());
+                System.out.println("\n" + EscapeSequences.SET_TEXT_COLOR_BLUE + notifMsg.getMessage());
                 printPrompt();
             }
         }

@@ -26,9 +26,15 @@ import websocket.messages.NotificationMessage;
 public class WebSocketHandler {
     private final ConnectionManager connections = new ConnectionManager();
 
-    private AuthDAO authDAO = new SqlAuthDAO();
-    private GameDAO gameDAO = new SqlGameDAO();
-    private UserDAO userDAO = new SqlUserDAO();
+    UserDAO userDAO;
+    AuthDAO authDAO;
+    GameDAO gameDAO;
+
+    public WebSocketHandler(UserDAO userDAO, AuthDAO authDao, GameDAO gameDAO) {
+        this.userDAO = userDAO;
+        this.authDAO = authDao;
+        this.gameDAO = gameDAO;
+    }
 
     public void handleConnection(WsMessageContext ctx) {
         try {
@@ -169,6 +175,17 @@ public class WebSocketHandler {
             Integer gameId = command.getGameID();
 
             connections.remove(username);
+
+            GameData gameData = gameDAO.getGame(gameId);
+            if(gameData != null) {
+                if(username.equals(gameData.whiteUsername())){
+                    gameData = new GameData(gameData.gameID(), null, gameData.blackUsername(), gameData.gameName(), gameData.game());
+                    gameDAO.updateGame(gameData);
+                } else if (username.equals(gameData.blackUsername())) {
+                    gameData = new GameData(gameData.gameID(), gameData.whiteUsername(), null, gameData.gameName(), gameData.game());
+                    gameDAO.updateGame(gameData);
+                }
+            }
 
             String message = "User " + username + " left game " + gameId;
             NotificationMessage notification = new NotificationMessage(message);

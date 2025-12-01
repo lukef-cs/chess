@@ -7,7 +7,7 @@ import java.net.URISyntaxException;
 import com.google.gson.Gson;
 
 import chess.ChessMove;
-import jakarta.websocket.*;
+import javax.websocket.*;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
@@ -34,9 +34,11 @@ public class WebSocketFacade extends Endpoint {
                 public void onMessage(String message) {
                     ServerMessage serverMessage = new Gson().fromJson(message, ServerMessage.class);
                     switch (serverMessage.getServerMessageType()) {
-                        case LOAD_GAME -> notificationHandler.notify(new Gson().fromJson(message, LoadGameMessage.class));
+                        case LOAD_GAME ->
+                                notificationHandler.notify(new Gson().fromJson(message, LoadGameMessage.class));
                         case ERROR -> notificationHandler.notify(new Gson().fromJson(message, ErrorMessage.class));
-                        case NOTIFICATION -> notificationHandler.notify(new Gson().fromJson(message, NotificationMessage.class));
+                        case NOTIFICATION ->
+                                notificationHandler.notify(new Gson().fromJson(message, NotificationMessage.class));
                     }
                 }
             });
@@ -49,7 +51,6 @@ public class WebSocketFacade extends Endpoint {
 
     @Override
     public void onOpen(Session session, EndpointConfig config) {
-        this.session = session;
     }
 
     public void joinGame(String authToken, Integer gameID) throws Exception {
@@ -87,5 +88,10 @@ public class WebSocketFacade extends Endpoint {
         } catch (IOException e) {
             throw new Exception("500: " + e.getMessage());
         }
+    }
+
+    @Override
+    public void onClose(Session session, CloseReason closeReason) {
+        // System.out.println("WebSocket connection closed: " + closeReason.getReasonPhrase());
     }
 }
