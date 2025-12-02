@@ -35,6 +35,7 @@ public class WebSocketFacade extends Endpoint {
 
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
             this.session = container.connectToServer(this, socketURI);
+            this.session.setMaxIdleTimeout(3600000); // 1 hour
 
             this.session.addMessageHandler(new MessageHandler.Whole<String>() {
                 @Override
@@ -58,6 +59,7 @@ public class WebSocketFacade extends Endpoint {
 
     @Override
     public void onOpen(Session session, EndpointConfig config) {
+        this.session = session;
     }
 
     public void joinGame(String authToken, Integer gameID) throws Exception {
@@ -82,7 +84,8 @@ public class WebSocketFacade extends Endpoint {
         try {
             UserGameCommand command = new UserGameCommand(UserGameCommand.CommandType.LEAVE, authToken, gameID);
             this.session.getBasicRemote().sendText(new Gson().toJson(command));
-            this.session.close();
+        } catch (IllegalStateException e) {
+            // Connection is already closed, ignore
         } catch (IOException e) {
             throw new Exception("500: " + e.getMessage());
         }
@@ -99,6 +102,6 @@ public class WebSocketFacade extends Endpoint {
 
     @Override
     public void onClose(Session session, CloseReason closeReason) {
-        // System.out.println("WebSocket connection closed: " + closeReason.getReasonPhrase());
+        System.out.println("WebSocket connection closed: " + closeReason.getReasonPhrase());
     }
 }

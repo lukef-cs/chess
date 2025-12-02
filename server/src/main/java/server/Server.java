@@ -102,6 +102,9 @@ public class Server {
         javalin.delete("/db", ctx -> handleClear(ctx));
 
         javalin.ws("/ws", ws -> {
+            ws.onConnect(ctx -> {
+                ctx.session.setIdleTimeout(java.time.Duration.ofMinutes(60));
+            });
             ws.onMessage(webSocketHandler::handleConnection);
         });
     }

@@ -200,7 +200,7 @@ public class Repl implements ServerMessageObserver{
                 this.playerColor = tokens[2].toUpperCase();
                 this.state = State.GAMEPLAY;
 
-                yield "Joined game as " + tokens[2] + "\n" + drawBoard(game.game(), tokens[2], null);
+                yield "Joined game as " + tokens[2];
             }
             case "observe" -> {
                 if (tokens.length != 2){
@@ -224,7 +224,7 @@ public class Repl implements ServerMessageObserver{
                 this.playerColor = null;
                 this.state = State.GAMEPLAY;
 
-                yield "Observing game\n" + drawBoard(game.game(), "WHITE", null);
+                yield "Observing game";
             }
             default -> "Unknown command. Type 'help' for options.";
         };
