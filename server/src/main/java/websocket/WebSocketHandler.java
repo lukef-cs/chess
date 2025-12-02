@@ -96,11 +96,7 @@ public class WebSocketHandler {
             connections.broadcast(username, notificaiton, gameId);
 
         } catch (Exception e){
-            try {
-                session.getRemote().sendString(new Gson().toJson(new ErrorMessage("Error: " + e.getMessage())));
-            } catch (IOException ioException) {
-                ioException.printStackTrace();
-            }
+            handleException(session, e);
         }
     }
 
@@ -143,7 +139,12 @@ public class WebSocketHandler {
                 return;
             }
 
-            ChessGame.TeamColor opponentsColor = game.getTeamTurn() == ChessGame.TeamColor.WHITE ? ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE;
+            ChessGame.TeamColor opponentsColor;
+            if (game.getTeamTurn() == ChessGame.TeamColor.WHITE) {
+                opponentsColor = ChessGame.TeamColor.BLACK;
+            } else {
+                opponentsColor = ChessGame.TeamColor.WHITE;
+            }
 
             String notificationMessage = null;
             if (game.isInCheckmate(game.getTeamTurn())) {
