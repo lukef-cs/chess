@@ -110,6 +110,8 @@ public class Server {
         String message = e.getMessage();
         if (message.contains("unauthorized")) {
             ctx.status(401).result(gson.toJson(Map.of("message", "Error: unauthorized"))).contentType("application/json");
+        } else if (message.contains("invalid credentials")) {
+            ctx.status(401).result(gson.toJson(Map.of("message", "Error: invalid credentials"))).contentType("application/json");
         } else if (message.contains("bad request")) {
             ctx.status(400).result(gson.toJson(Map.of("message", "Error: bad request"))).contentType("application/json");
         } else {
