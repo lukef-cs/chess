@@ -91,7 +91,14 @@ public class WebSocketHandler {
             LoadGameMessage loadGameMessage = new LoadGameMessage(gameData);
             session.getRemote().sendString(new Gson().toJson(loadGameMessage));
 
-            String message = "User " + username + " connected to game " + gameId;
+            String role = "an observer";
+            if (username.equals(gameData.whiteUsername())) {
+                role = "WHITE";
+            } else if (username.equals(gameData.blackUsername())) {
+                role = "BLACK";
+            }
+
+            String message = "User " + username + " connected to game " + gameData.gameName() + " as " + role;
             NotificationMessage notificaiton = new NotificationMessage(message);
             connections.broadcast(username, notificaiton, gameId);
 
@@ -209,17 +216,20 @@ public class WebSocketHandler {
             connections.remove(username);
 
             GameData gameData = gameDAO.getGame(gameId);
+            String role = "an observer";
             if(gameData != null) {
                 if(username.equals(gameData.whiteUsername())){
+                    role = "WHITE";
                     gameData = new GameData(gameData.gameID(), null, gameData.blackUsername(), gameData.gameName(), gameData.game());
                     gameDAO.updateGame(gameData);
                 } else if (username.equals(gameData.blackUsername())) {
+                    role = "BLACK";
                     gameData = new GameData(gameData.gameID(), gameData.whiteUsername(), null, gameData.gameName(), gameData.game());
                     gameDAO.updateGame(gameData);
                 }
             }
 
-            String message = "User " + username + " left game " + gameId;
+            String message = "User " + username + " left game " + gameData.gameName() + " as " + role;
             NotificationMessage notification = new NotificationMessage(message);
             connections.broadcast(username, notification, gameId);
 
@@ -260,7 +270,7 @@ public class WebSocketHandler {
 
             gameDAO.updateGame(gameData);
 
-            String message = "User " + username + " has resigned from game " + gameId;
+            String message = "User " + username + " has resigned from game " + gameData.gameName();
             NotificationMessage notification = new NotificationMessage(message);
             connections.broadcast("", notification, gameId);
 
