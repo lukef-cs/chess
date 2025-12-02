@@ -249,7 +249,9 @@ public class Repl implements ServerMessageObserver{
                 yield "Left the game.";
             }
             case "move" -> {
-                if (tokens.length < 3) yield "Expected: move <from> <to> [promotion]";
+                if (tokens.length < 3) {
+                    yield "Expected: move <from> <to> [promotion]";
+                }
                 String promotion = tokens.length > 3 ? tokens[3].toUpperCase() : null;
                 ChessPiece.PieceType promoType = null;
                 if (promotion != null) {
@@ -278,7 +280,9 @@ public class Repl implements ServerMessageObserver{
                 }
             }
             case "highlight" -> {
-                if (tokens.length != 2) yield "Expected: highlight <pos>";
+                if (tokens.length != 2){
+                    yield "Expected: highlight <pos>";
+                }
                 try {
                     ChessPosition pos = parsePosition(tokens[1]);
                     var moves = activeGame.game().validMoves(pos);
@@ -286,7 +290,9 @@ public class Repl implements ServerMessageObserver{
                         yield "No legal moves for that piece.";
                     }
                     Set<ChessPosition> targets = new HashSet<>();
-                    for(var m : moves) targets.add(m.getEndPosition());
+                    for(var m : moves) {
+                        targets.add(m.getEndPosition());
+                    }
                     yield drawBoard(activeGame.game(), playerColor, targets);
                 } catch (Exception e) {
                     yield "Invalid position.";
@@ -297,12 +303,16 @@ public class Repl implements ServerMessageObserver{
     }
 
     private ChessPosition parsePosition(String pos) throws Exception {
-        if (pos.length() != 2) throw new Exception("Invalid position format");
+        if (pos.length() != 2) {
+            throw new Exception("Invalid position format");
+        }
         char colChar = pos.charAt(0);
         char rowChar = pos.charAt(1);
         int col = colChar - 'a' + 1;
         int row = rowChar - '1' + 1;
-        if (col < 1 || col > 8 || row < 1 || row > 8) throw new Exception("Position out of bounds");
+        if (col < 1 || col > 8 || row < 1 || row > 8) {
+            throw new Exception("Position out of bounds");
+        }
         return new ChessPosition(row, col);
     }
 

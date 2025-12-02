@@ -2,6 +2,8 @@ package websocket;
 
 import java.io.IOException;
 
+import org.eclipse.jetty.websocket.api.Session;
+
 import com.google.gson.Gson;
 
 import chess.ChessGame;
@@ -29,6 +31,14 @@ public class WebSocketHandler {
     UserDAO userDAO;
     AuthDAO authDAO;
     GameDAO gameDAO;
+
+    private void handleException(Session session, Exception e) {
+        try {
+            session.getRemote().sendString(new Gson().toJson(new ErrorMessage("Error: " + e.getMessage())));
+        } catch (IOException ioException) {
+            ioException.printStackTrace();
+        }
+    }
 
     public WebSocketHandler(UserDAO userDAO, AuthDAO authDao, GameDAO gameDAO) {
         this.userDAO = userDAO;
@@ -59,7 +69,7 @@ public class WebSocketHandler {
         }
     }
 
-    private void connect(org.eclipse.jetty.websocket.api.Session session, UserGameCommand command) {
+    private void connect(Session session, UserGameCommand command) {
         try{
             AuthData authData = authDAO.getAuth(command.getAuthToken());
             if (authData == null) {
@@ -94,7 +104,7 @@ public class WebSocketHandler {
         }
     }
 
-    private void makeMove(org.eclipse.jetty.websocket.api.Session session, MakeMoveCommand command) {
+    private void makeMove(Session session, MakeMoveCommand command) {
         try {
             AuthData authData = authDAO.getAuth(command.getAuthToken());
             if (authData == null) {
@@ -121,7 +131,8 @@ public class WebSocketHandler {
                 session.getRemote().sendString(new Gson().toJson(new ErrorMessage("Error: Not your turn")));
                 return;
             } else if (game.getTeamTurn() == ChessGame.TeamColor.BLACK && !username.equals(gameData.blackUsername())) {
-                session.getRemote().sendString(new Gson().toJson(new ErrorMessage("Error: Not your turn")));
+                String message = "Error: Not your turn";
+                session.getRemote().sendString(new Gson().toJson(new ErrorMessage(message)));
                 return;
             }
 
@@ -155,15 +166,11 @@ public class WebSocketHandler {
             connections.broadcast(username, notification, gameId);
 
         } catch (Exception e){
-            try {
-                session.getRemote().sendString(new Gson().toJson(new ErrorMessage("Error: " + e.getMessage())));
-            } catch (IOException ioException) {
-                ioException.printStackTrace();
-            }
+            handleException(session, e);
         }
     }
 
-    private void leave(org.eclipse.jetty.websocket.api.Session session, UserGameCommand command) {
+    private void leave(Session session, UserGameCommand command) {
         try {
             AuthData authData = authDAO.getAuth(command.getAuthToken());
             if (authData == null) {
@@ -192,15 +199,11 @@ public class WebSocketHandler {
             connections.broadcast(username, notification, gameId);
 
         } catch (Exception e){
-            try {
-                session.getRemote().sendString(new Gson().toJson(new ErrorMessage("Error: " + e.getMessage())));
-            } catch (IOException ioException) {
-                ioException.printStackTrace();
-            }
+            handleException(session, e);
         }
     }
 
-    private void resign(org.eclipse.jetty.websocket.api.Session session, UserGameCommand command) {
+    private void resign(Session session, UserGameCommand command) {
         try {
             AuthData authData = authDAO.getAuth(command.getAuthToken());
             if (authData == null) {
@@ -237,11 +240,7 @@ public class WebSocketHandler {
             connections.broadcast("", notification, gameId);
 
         } catch (Exception e){
-            try {
-                session.getRemote().sendString(new Gson().toJson(new ErrorMessage("Error: " + e.getMessage())));
-            } catch (IOException ioException) {
-                ioException.printStackTrace();
-            }
+            handleException(session, e);
         }
     }
 }

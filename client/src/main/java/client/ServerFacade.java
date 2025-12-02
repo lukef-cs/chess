@@ -20,6 +20,25 @@ public class ServerFacade {
     private final Gson gson = new Gson();
     private final HttpClient client = HttpClient.newHttpClient();
 
+    private String mapErrorMessage(String rawMessage) {
+        String userFriendlyMessage;
+        if (rawMessage.contains("bad request")) {
+            userFriendlyMessage = "Invalid input. Please check your command and try again.";
+        } else if (rawMessage.contains("unauthorized")) {
+            userFriendlyMessage = "You are not logged in or your session has expired. Please log in again.";
+        } else if (rawMessage.contains("color already taken")) {
+            userFriendlyMessage = "That color is already taken in this game.";
+        } else if (rawMessage.contains("already exists")) {
+            userFriendlyMessage = "A user with that username already exists.";
+        } else if (rawMessage.contains("invalid credentials")) {
+            userFriendlyMessage = "Invalid username or password. Please try again.";
+        } else {
+            // Use the raw message if it starts with "Error:" (strip it for readability)
+            userFriendlyMessage = rawMessage.startsWith("Error: ") ? rawMessage.substring(7) : rawMessage;
+        }
+        return userFriendlyMessage;
+    }
+
     private <T> T makeRequest(String method, String path, Object body, String authToken, Class<T> responseClass) throws Exception {
         var url = URI.create(serverString + path);
         var requestBuilder = HttpRequest.newBuilder()
@@ -48,20 +67,7 @@ public class ServerFacade {
                     String rawMessage = (String) errorMap.get("message");
                     if (rawMessage != null) {
                         // Map server error messages to user-friendly ones
-                        if (rawMessage.contains("bad request")) {
-                            userFriendlyMessage = "Invalid input. Please check your command and try again.";
-                        } else if (rawMessage.contains("unauthorized")) {
-                            userFriendlyMessage = "You are not logged in or your session has expired. Please log in again.";
-                        } else if (rawMessage.contains("color already taken")) {
-                            userFriendlyMessage = "That color is already taken in this game.";
-                        } else if (rawMessage.contains("already exists")) {
-                            userFriendlyMessage = "A user with that username already exists.";
-                        } else if (rawMessage.contains("invalid credentials")) {
-                            userFriendlyMessage = "Invalid username or password. Please try again.";
-                        } else {
-                            // Use the raw message if it starts with "Error:" (strip it for readability)
-                            userFriendlyMessage = rawMessage.startsWith("Error: ") ? rawMessage.substring(7) : rawMessage;
-                        }
+                        userFriendlyMessage = mapErrorMessage(rawMessage);
                     }
                 } catch (Exception e) {
                     // If JSON parsing fails, use a generic message
