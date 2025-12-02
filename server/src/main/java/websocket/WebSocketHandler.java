@@ -162,13 +162,37 @@ public class WebSocketHandler {
             LoadGameMessage loadGameMessage = new LoadGameMessage(gameData);
             connections.broadcast("", loadGameMessage, gameId);
 
-            String message = "User " + username + " made move " + command.getMove() + " in game " + gameId;
+            String message = "User " + username + " made move " + formatMove(command.getMove(), game) + " in game " + gameData.gameName();
             NotificationMessage notification = new NotificationMessage(message);
             connections.broadcast(username, notification, gameId);
+
+            if (notificationMessage != null) {
+                NotificationMessage statusNotification = new NotificationMessage(notificationMessage);
+                connections.broadcast("", statusNotification, gameId);
+            }
 
         } catch (Exception e){
             handleException(session, e);
         }
+    }
+
+    private String formatMove(chess.ChessMove move, chess.ChessGame game) {
+        chess.ChessPosition start = move.getStartPosition();
+        chess.ChessPosition end = move.getEndPosition();
+        chess.ChessPiece piece = game.getBoard().getPiece(end);
+        String pieceName;
+        if (piece != null){
+            pieceName = piece.getPieceType().toString();
+        } else {
+            pieceName = "Piece";
+        }
+        pieceName = pieceName.charAt(0) + pieceName.substring(1).toLowerCase();
+        return pieceName + " " + getPositionString(start) + " to " + getPositionString(end);
+    }
+
+    private String getPositionString(chess.ChessPosition pos) {
+        char colChar = (char) ('a' + pos.getColumn() - 1);
+        return "" + colChar + pos.getRow();
     }
 
     private void leave(Session session, UserGameCommand command) {
