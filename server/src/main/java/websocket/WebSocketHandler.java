@@ -160,8 +160,8 @@ public class WebSocketHandler {
             }  else if (game.isInStalemate(game.getTeamTurn())) {
                 game.setGameOver(true);
                 notificationMessage = "Stalemate! The game is a draw.";
-            } else if (game.isInCheck(opponentsColor)) {
-                notificationMessage = "Check! " + (game.getTeamTurn() == ChessGame.TeamColor.WHITE ? "White" : "Black") + "'s turn.";
+            } else if (game.isInCheck(game.getTeamTurn())) {
+                notificationMessage = "Check! " + (game.getTeamTurn() == ChessGame.TeamColor.WHITE ? "White" : "Black") + " is in check!";
             }
 
             gameDAO.updateGame(gameData);
